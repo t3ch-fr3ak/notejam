@@ -16,7 +16,7 @@ from_env = {'production': ProductionConfig,
 
 # @TODO use application factory approach
 app = Flask(__name__)
-app.config.from_object(from_env[os.environ.get('ENVIRONMENT', 'testing')])
+app.config.from_object(from_env[os.environ.get('ENVIRONMENT', 'production')])
 db = SQLAlchemy(app)
 
 

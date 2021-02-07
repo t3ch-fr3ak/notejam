@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout git repository
+      uses: actions/checkout@v2
+
+    - name: Azure Login
+      uses: Azure/login@v1
+      with:
+        # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+        creds: ${{secrets.AZURE_CREDENTIALS}}
+
+    - name: Create docker container and deploy to Azure Container Registry
+      uses: Azure/cli@1.0.4
+      with:
+        # Specify the script here
+        inlineScript: az acr build -t notejam:{{.Run.ID}} -t notejam:dev -t notejam:int -t notejam:prd -r notejamacr .

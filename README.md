@@ -35,3 +35,13 @@ EXPOSE 5000
 # run the application
 CMD ["python", "/usr/src/app/runserver.py"]
 ```
+
+## Architectural Overview
+In order to cover all requirements, a scalable, highly available and easily deployable infrastructure has to be setup. Therefore the following components will be used:
+- GitHub repository as source code control
+- GitHub branching concept for continuous testing and continuous deployment in DEV
+- GitHub actions as CI/CD pipeline for DEV and PRD environment
+- Azure Container Registry as a docker image repository with versioning, backup and geo-replication
+- Multiple Azure Web Apps (for geo-redundancy) as a docker host with application slots for DEV, INT and PRD. Application metrics and continuous deployment from the Azure Container Registry are configured and enabled
+- Azure MySQL database instead of a SQLite3 database for concurrent usage and high availabilty using replica databases for geo-replication and automatic backups
+- Azure Front Door as a single point of entry and load balancing between the multiple Azure Web App instances

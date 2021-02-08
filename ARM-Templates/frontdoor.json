@@ -1,0 +1,156 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "frontdoor_name": {
+            "defaultValue": "notejam-fd",
+            "type": "String"
+        },
+        "backend_poolname_1": {
+            "defaultValue": "notejam-westeurope",
+            "type": "String"
+        },
+        "backend_poolname_2": {
+            "defaultValue": "notejam-northeurope",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "backend_uri_1": "[concat(parameters('backend_poolname_1'), '.azurewebsites.net')]",
+        "backend_uri_2": "[concat(parameters('backend_poolname_1'), '.azurewebsites.net')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/frontdoors",
+            "apiVersion": "2020-05-01",
+            "name": "[parameters('frontdoor_name')]",
+            "location": "Global",
+            "properties": {
+                "resourceState": "Enabled",
+                "backendPools": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/BackendPools/', parameters('backend_poolname_1'))]",
+                        "name": "[parameters('backend_poolname_1')]",
+                        "properties": {
+                            "backends": [
+                                {
+                                    "address": "[variables('backend_uri_1')]",
+                                    "httpPort": 80,
+                                    "httpsPort": 443,
+                                    "priority": 1,
+                                    "weight": 50,
+                                    "backendHostHeader": "[variables('backend_uri_1')]",
+                                    "enabledState": "Enabled"
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/HealthProbeSettings/healthProbeSettings-', parameters('frontdoor_name'))]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/LoadBalancingSettings/loadBalancingSettings-', parameters('frontdoor_name'))]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    },
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/BackendPools/', parameters('backend_poolname_2'))]",
+                        "name": "[parameters('backend_poolname_2')]",
+                        "properties": {
+                            "backends": [
+                                {
+                                    "address": "[variables('backend_uri_2')]",
+                                    "httpPort": 80,
+                                    "httpsPort": 443,
+                                    "priority": 1,
+                                    "weight": 50,
+                                    "backendHostHeader": "[variables('backend_uri_2')]",
+                                    "enabledState": "Enabled"
+                                }
+                            ],
+                            "healthProbeSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/HealthProbeSettings/healthProbeSettings-', parameters('frontdoor_name'))]"
+                            },
+                            "loadBalancingSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/LoadBalancingSettings/loadBalancingSettings-', parameters('frontdoor_name'))]"
+                            },
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "healthProbeSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/HealthProbeSettings/healthProbeSettings-', parameters('frontdoor_name'))]",
+                        "name": "[concat('healthProbeSettings-', parameters('frontdoor_name'))]",
+                        "properties": {
+                            "intervalInSeconds": 30,
+                            "path": "/",
+                            "protocol": "Https",
+                            "resourceState": "Enabled",
+                            "enabledState": "Enabled",
+                            "healthProbeMethod": "Head"
+                        }
+                    }
+                ],
+                "frontendEndpoints": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), concat('/FrontendEndpoints/', parameters('frontdoor_name'), '-azurefd-net'))]",
+                        "name": "[concat(parameters('frontdoor_name'), '-azurefd-net')]",
+                        "properties": {
+                            "hostName": "[concat(parameters('frontdoor_name'), '.azurefd.net')]",
+                            "sessionAffinityEnabledState": "Enabled",
+                            "sessionAffinityTtlSeconds": 0,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "loadBalancingSettings": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/LoadBalancingSettings/loadBalancingSettings-', parameters('frontdoor_name'))]",
+                        "name": "[concat('loadBalancingSettings-', parameters('frontdoor_name'))]",
+                        "properties": {
+                            "additionalLatencyMilliseconds": 0,
+                            "sampleSize": 4,
+                            "successfulSamplesRequired": 2,
+                            "resourceState": "Enabled"
+                        }
+                    }
+                ],
+                "routingRules": [
+                    {
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/RoutingRules/notejam-rule')]",
+                        "name": "notejam-rule",
+                        "properties": {
+                            "frontendEndpoints": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), concat('/FrontendEndpoints/', parameters('frontdoor_name'), '-azurefd-net'))]"
+                                }
+                            ],
+                            "acceptedProtocols": [
+                                "Http",
+                                "Https"
+                            ],
+                            "patternsToMatch": [
+                                "/*"
+                            ],
+                            "enabledState": "Enabled",
+                            "resourceState": "Enabled",
+                            "routeConfiguration": {
+                                "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
+                                "forwardingProtocol": "HttpsOnly",
+                                "backendPool": {
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/backendPools/', parameters('backend_poolname_1'))]"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "backendPoolsSettings": {
+                    "enforceCertificateNameCheck": "Enabled",
+                    "sendRecvTimeoutSeconds": 30
+                },
+                "enabledState": "Enabled",
+                "friendlyName": "[parameters('frontdoor_name')]"
+            }
+        }
+    ]
+}

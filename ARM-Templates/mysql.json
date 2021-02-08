@@ -1,0 +1,119 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "defaultValue": "notejam-server",
+            "type": "string"
+        },
+        "databaseName": {
+            "type": "string",
+            "defaultValue": "notejam"
+        },
+        "databaseNameDev": {
+            "type": "string",
+            "defaultValue": "notejamdev"
+        },
+        "adminUserName": {
+            "type": "string",
+            "minLength": 1
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "minLength": 8
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "westeurope"
+        },
+        "location2": {
+            "type": "string",
+            "defaultValue": "northeurope"
+        }
+    },
+    "variables": {
+        "sku": {
+            "name": "GP_Gen5_2",
+            "tier": "GeneralPurpose",
+            "family": "Gen5",
+            "capacity": 2
+        },
+        "storageProfile": {
+            "storageMB": 102400,
+            "backupRetentionDays": 7,
+            "geoRedundantBackup": "Enabled"
+        },
+        "replicaName": "[concat(parameters('serverName'), '-replica')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.DBforMySQL/servers",
+            "apiVersion": "2017-12-01",
+            "name": "[parameters('serverName')]",
+            "location": "[parameters('location')]",
+            "sku": "[variables('sku')]",
+            "properties": {
+                "createMode": "Default",
+                "administratorLogin": "[parameters('adminUserName')]",
+                "administratorLoginPassword": "[parameters('adminPassword')]",
+                "storageProfile": "[variables('storageProfile')]",
+                "version": "5.7",
+                "sslEnforcement": "Disabled",
+                "minimalTlsVersion": "TLSEnforcementDisabled",
+                "infrastructureEncryption": "Disabled",
+                "publicNetworkAccess": "Enabled"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers",
+            "sku": "[variables('sku')]",
+            "name": "[variables('replicaName')]",
+            "apiVersion": "2017-12-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "storageProfile": "[variables('storageProfile')]",
+                "createMode": "Replica",
+                "sourceServerId": "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/firewallRules",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('serverName'), '/AllowAllWindowsAzureIps')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('serverName'), '/', parameters('databaseName'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "charset": "utf8",
+                "collation": "utf8_general_ci"
+            }
+        },
+        {
+            "type": "Microsoft.DBforMySQL/servers/databases",
+            "apiVersion": "2017-12-01",
+            "name": "[concat(parameters('serverName'), '/', parameters('databaseNameDev'))]",
+            "dependsOn": [
+                "[resourceId('Microsoft.DBforMySQL/servers', parameters('serverName'))]"
+            ],
+            "properties": {
+                "charset": "utf8",
+                "collation": "utf8_general_ci"
+            }
+        }
+    ]
+}

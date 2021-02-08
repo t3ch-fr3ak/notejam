@@ -59,7 +59,7 @@ In order to cover all requirements, a scalable, highly available and easily depl
 - GitHub branching concept for continuous testing and continuous deployment in DEV
 - GitHub actions as CI/CD pipeline for DEV and PRD environment
 - Azure Container Registry as a docker image repository with versioning, backup and geo-replication
-- Multiple Azure Web Apps (for geo-redundancy) as a docker host with application slots for DEV, INT and PRD. Application metrics and continuous deployment from the Azure Container Registry are configured and enabled
+- 2 Azure Web Apps (for geo-redundancy) as a docker host with application slots for DEV, INT and PRD. Application metrics and continuous deployment from the Azure Container Registry are configured and enabled, as well as auto-scaling.
 - Azure MySQL database instead of a SQLite3 database for concurrent usage and high availabilty using a replica database for geo-replication and automatic backups
 - Azure Front Door as a single point of entry and load balancing between the multiple Azure Web App instances
 
@@ -95,3 +95,12 @@ Please ensure to update the container registry name in all 3 workflows according
 In addition, copy the output of the service principal creation to a Git Secret called **AZURE_CREDENTIALS**.
 
 `az ad sp create-for-rbac --name "GitHubActions" --role contributor --sdk-auth`
+
+
+## Outlook
+In order to further meet the business requirements, the following changes are recommended:
+- Utilize Application Insights in the application code for transparent reporting and metrics
+- Create a central Log Analytics Workspace and enable diagnostic settings on all services to log to the workspace.
+- Create operational dashboards
+- Backup the database to an Azure Storage Account in the archive tier, e.g. by utilizing an Azure Runbook.
+- Create resource locks for deletion on the Resource Group or at least on the Azure Container Registry and the Database Servers

@@ -1,4 +1,6 @@
 # notejam
+Unified sample web app. The easy way to learn web frameworks.
+
 This document describes how to automatically deploy andy hyper-scale the notejam web application to Microsoft Azure.
 The original project document can be found [here](https://github.com/t3ch-fr3ak/notejam/blob/master/README-original.rst).
 
@@ -49,6 +51,9 @@ CMD ["python", "/usr/src/app/runserver.py"]
 ```
 
 ## Architectural Overview
+
+![architectural overview](architecture.png)
+
 In order to cover all requirements, a scalable, highly available and easily deployable infrastructure has to be setup. Therefore the following components will be used:
 - GitHub repository as source code control
 - GitHub branching concept for continuous testing and continuous deployment in DEV
@@ -65,10 +70,18 @@ As part of the infrastructure deployment, the docker container is already create
 
 1. Login to Azure Shell [shell.azure.com/](http://shell.azure.com/)
 1. Select Bash if not already selected
-1. Clone this repository by running `git clone https://github.com/t3ch-fr3ak/notejam`
-1. Navigate to the notejam folder by running `cd notejam`
-1. Apply execute permissions by running `chown +x deployment.sh`
-1. Start the deployment by running `./deployment.sh`
+1. Clone this repository by running 
+
+    `git clone https://github.com/t3ch-fr3ak/notejam`
+1. Navigate to the notejam folder by running 
+
+    `cd notejam`
+1. Apply execute permissions by running 
+    
+    `chown +x deployment.sh`
+1. Start the deployment by running 
+
+    `./deployment.sh`
 
 ## CI/CD
 For continuous deployment, 3 environments get created using Azure Web App Slots (DEV, INT, PRD). Each slot is configured for the corresponding docker image tagged DEV, INT or PRD. 
@@ -79,3 +92,6 @@ In order to deploy to any of these environments, 3 GitHub Actions Workflows have
 1. [deploy-dev.yml](https://github.com/t3ch-fr3ak/notejam/blob/master/.github/workflows/deploy-dev.yml): continuous deployment to the INT container image for pushes and pull requests on branches starting with **dev/\***.
 
 Please ensure to update the container registry name in all 3 workflows according to the Azure Container Registry deployed before.
+In addition, copy the output of the service principal creation to a Git Secret called **AZURE_CREDENTIALS**.
+
+`az ad sp create-for-rbac --name "GitHubActions" --role contributor --sdk-auth`

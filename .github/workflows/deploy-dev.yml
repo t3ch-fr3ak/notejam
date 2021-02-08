@@ -1,10 +1,10 @@
-name: Docker Image CI
+name: Deploy to DEV
 
 on:
   push:
-    branches: [ master ]
+    branches: [ 'dev/**' ]
   pull_request:
-    branches: [ master ]
+    branches: [ 'dev/**' ]
 
 jobs:
 
@@ -26,4 +26,4 @@ jobs:
       uses: Azure/cli@1.0.4
       with:
         # Specify the script here
-        inlineScript: az acr build -t notejam:{{.Run.ID}} -t notejam:dev -t notejam:int -t notejam:prd -r notejamacr .
+        inlineScript: az acr build -t notejam:{{.Run.ID}} -t notejam:dev -r notejamacr .

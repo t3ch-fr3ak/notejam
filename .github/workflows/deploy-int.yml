@@ -2,10 +2,9 @@ name: Deploy to INT
 
 on:
   push:
-    branches: 
-      - 'int/**'
+    branches: [ 'int/**' ]
   pull_request:
-      - 'int/**'
+    branches: [ 'int/**' ]
 
 jobs:
 

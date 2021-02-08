@@ -104,3 +104,4 @@ In order to further meet the business requirements, the following changes are re
 - Create operational dashboards
 - Backup the database to an Azure Storage Account in the archive tier, e.g. by utilizing an Azure Runbook.
 - Create resource locks for deletion on the Resource Group or at least on the Azure Container Registry and the Database Servers
+- Ensure security by enforcing SSL, utilizing Azure Defender and configuring Web Application Firewalls at Front Door

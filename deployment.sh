@@ -17,8 +17,7 @@ sqlServer=$nameprefix"-server"
 sqlDatabase="notejam"
 sqlDatabaseDev=$sqlDatabase"dev"
 sqlAdminUser=$nameprefix"admin"
-sqlAdminPassword=$nameprefix"password123!"
-#read -s -p "Enter SQL Admin Password : " sqlAdminPassword
+read -s -p "Enter SQL Admin Password with chars, numbers and special characters : " sqlAdminPassword
 sqlDatabaseUri="mysql+pymysql://"$sqlAdminUser"@"$sqlServer":"$sqlAdminPassword"@"$sqlServer".mysql.database.azure.com:3306/"$sqlDatabase"?charset=utf8"
 sqlDatabaseUriDev="mysql+pymysql://"$sqlAdminUser"@"$sqlServer":"$sqlAdminPassword"@"$sqlServer".mysql.database.azure.com:3306/"$sqlDatabaseDev"?charset=utf8"
 

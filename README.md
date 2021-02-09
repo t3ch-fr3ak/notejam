@@ -100,9 +100,10 @@ In addition, copy the output of the service principal creation to a Git Secret c
 ## Outlook
 In order to further meet the business requirements, the following changes are recommended:
 - Utilize Application Insights in the application code for transparent reporting and metrics
-- Create a central Log Analytics Workspace and enable diagnostic settings on all services to log to the workspace.
+- Create a central Log Analytics Workspace and enable diagnostic settings on all services to log to the workspace
 - Create operational dashboards
 - Backup the database to an Azure Storage Account in the archive tier, e.g. by utilizing an Azure Runbook.
 - Create resource locks for deletion on the Resource Group or at least on the Azure Container Registry and the Database Servers
 - Ensure security by enforcing SSL, utilizing Azure Defender and configuring Web Application Firewalls at Front Door
 - Use Azure KeyVault for secure password handling and automatic key rotation (e.g. container registry, MySQL user)
+- Implement automatic database failover including connection string change for the web app or consider a load balancer for SQL traffic

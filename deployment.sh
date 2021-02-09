@@ -1,6 +1,7 @@
 #!/bin/bash
 
-nameprefix="notejamapp"
+#nameprefix="notejamapp"
+read -p "Enter a unique app prefix, e.g. notejam83 : " nameprefix
 
 resourceGroupName=$nameprefix
 location="westeurope"

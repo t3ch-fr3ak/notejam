@@ -9,8 +9,9 @@ location2="northeurope"
 registryName=$nameprefix"acr"
 imageName=$nameprefix
 appName=$nameprefix"-app"
-backendPoolName1=$appName"-"$location
-backendPoolName2=$appName"-"$location2
+backendPoolName=$nameprefix"-backend"
+appName1=$appName"-"$location
+appName2=$appName"-"$location2
 servicePlan1=$nameprefix"-asp-1"
 servicePlan2=$nameprefix"-asp-2"
 frontdoorName=$nameprefix"-fd"
@@ -40,13 +41,13 @@ username=$(echo $credentials | jq -r '.username')
 password=$(echo $credentials | jq -r '.passwords[0].value')
 
 echo "Creating Web App in $location"
-az deployment group create --resource-group $resourceGroupName --template-file ./ARM-Templates/webapp.json --parameters app_name=$backendPoolName1 app_service_plan_name=$servicePlan1 container_registry_uri=$registryName".azurecr.io" container_image_name=$imageName location=$location acr_admin_user=$username acr_admin_password=$password sql_database_uri=$sqlDatabaseUri sql_database_uri_dev=$sqlDatabaseUriDev
+az deployment group create --resource-group $resourceGroupName --template-file ./ARM-Templates/webapp.json --parameters app_name=$appName1 app_service_plan_name=$servicePlan1 container_registry_uri=$registryName".azurecr.io" container_image_name=$imageName location=$location acr_admin_user=$username acr_admin_password=$password sql_database_uri=$sqlDatabaseUri sql_database_uri_dev=$sqlDatabaseUriDev
 
 echo "Creating Web App in $location2"
-az deployment group create --resource-group $resourceGroupName --template-file ./ARM-Templates/webapp.json --parameters app_name=$backendPoolName2 app_service_plan_name=$servicePlan2 container_registry_uri=$registryName".azurecr.io" container_image_name=$imageName location=$location2 acr_admin_user=$username acr_admin_password=$password sql_database_uri=$sqlDatabaseUri sql_database_uri_dev=$sqlDatabaseUriDev
+az deployment group create --resource-group $resourceGroupName --template-file ./ARM-Templates/webapp.json --parameters app_name=$appName2 app_service_plan_name=$servicePlan2 container_registry_uri=$registryName".azurecr.io" container_image_name=$imageName location=$location2 acr_admin_user=$username acr_admin_password=$password sql_database_uri=$sqlDatabaseUri sql_database_uri_dev=$sqlDatabaseUriDev
 
 echo "Creating Front Door"
-az deployment group create --resource-group $resourceGroupName --template-file ./ARM-Templates/frontdoor.json --parameters frontdoor_name=$frontdoorName backend_poolname_1=$backendPoolName1 backend_poolname_2=$backendPoolName2 
+az deployment group create --resource-group $resourceGroupName --template-file ./ARM-Templates/frontdoor.json --parameters frontdoor_name=$frontdoorName backend_poolname=$backendPoolName backend_name_1=$appName1 backend_name_2=$appName2 
 
 
 echo "Execute the following statement to retrieve secrets for GitHub Actions"

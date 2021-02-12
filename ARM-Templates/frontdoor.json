@@ -6,18 +6,22 @@
             "defaultValue": "notejam-fd",
             "type": "String"
         },
-        "backend_poolname_1": {
+        "backend_poolname": {
+            "defaultValue": "notejam-backend",
+            "type": "String"
+        },
+        "backend_name_1": {
             "defaultValue": "notejam-westeurope",
             "type": "String"
         },
-        "backend_poolname_2": {
+        "backend_name_2": {
             "defaultValue": "notejam-northeurope",
             "type": "String"
         }
     },
     "variables": {
-        "backend_uri_1": "[concat(parameters('backend_poolname_1'), '.azurewebsites.net')]",
-        "backend_uri_2": "[concat(parameters('backend_poolname_1'), '.azurewebsites.net')]"
+        "backend_uri_1": "[concat(parameters('backend_name_1'), '.azurewebsites.net')]",
+        "backend_uri_2": "[concat(parameters('backend_name_2'), '.azurewebsites.net')]"
     },
     "resources": [
         {
@@ -29,8 +33,8 @@
                 "resourceState": "Enabled",
                 "backendPools": [
                     {
-                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/BackendPools/', parameters('backend_poolname_1'))]",
-                        "name": "[parameters('backend_poolname_1')]",
+                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/BackendPools/', parameters('backend_poolname'))]",
+                        "name": "[parameters('backend_poolname')]",
                         "properties": {
                             "backends": [
                                 {
@@ -41,22 +45,7 @@
                                     "weight": 50,
                                     "backendHostHeader": "[variables('backend_uri_1')]",
                                     "enabledState": "Enabled"
-                                }
-                            ],
-                            "healthProbeSettings": {
-                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/HealthProbeSettings/healthProbeSettings-', parameters('frontdoor_name'))]"
-                            },
-                            "loadBalancingSettings": {
-                                "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/LoadBalancingSettings/loadBalancingSettings-', parameters('frontdoor_name'))]"
-                            },
-                            "resourceState": "Enabled"
-                        }
-                    },
-                    {
-                        "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/BackendPools/', parameters('backend_poolname_2'))]",
-                        "name": "[parameters('backend_poolname_2')]",
-                        "properties": {
-                            "backends": [
+                                },
                                 {
                                     "address": "[variables('backend_uri_2')]",
                                     "httpPort": 80,
@@ -138,7 +127,7 @@
                                 "@odata.type": "#Microsoft.Azure.FrontDoor.Models.FrontdoorForwardingConfiguration",
                                 "forwardingProtocol": "HttpsOnly",
                                 "backendPool": {
-                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/backendPools/', parameters('backend_poolname_1'))]"
+                                    "id": "[concat(resourceId('Microsoft.Network/frontdoors', parameters('frontdoor_name')), '/backendPools/', parameters('backend_poolname'))]"
                                 }
                             }
                         }
